@@ -1,2 +1,0 @@
-# PowderPoints
-Projekt PowderPoints
