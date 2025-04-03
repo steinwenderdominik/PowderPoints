@@ -7,7 +7,7 @@ $dbname = 'powderpoints';
 $user = 'root';
 $pass = '';
 
-$conn = new mysqli($host, $user, $pass, $dbname);
+$conn = new mysql($host, $user, $pass, $dbname);
 
 // Verbindung prüfen
 if ($conn->connect_error) {
