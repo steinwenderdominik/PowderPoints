@@ -101,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 Trage deine Trainingsdaten ein und vergleiche dich mit anderen Athleten!
             </p>
 
-            <form method="POST" action="" class="space-y-4">
+            <form method="POST" action="hsmelden.php" class="space-y-4">
                 <div>
                     <label for="name" class="block text-blue-900 font-semibold">Name:</label>
                     <input type="text" name="name" id="name" required 
