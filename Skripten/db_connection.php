@@ -9,4 +9,3 @@ try {
     die("Fehler beim Verbindungsaufbau zur Datenbank: " . $e->getMessage());
 }
 ?>
-
