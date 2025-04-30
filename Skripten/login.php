@@ -1,19 +1,6 @@
 <?php
 session_start(); // Sitzung starten
 
-// 1. **Datenbankverbindung herstellen**
-$host = 'localhost';
-$dbname = 'powderpoints';
-$user = 'root';
-$pass = '';
-
-$conn = new mysql($host, $user, $pass, $dbname);
-
-// Verbindung prüfen
-if ($conn->connect_error) {
-    die("Fehler: Verbindung fehlgeschlagen!"); 
-}
-
 $error = ""; // Fehler-Variable initialisieren
 
 // 2. **Prüfen, ob das Formular abgeschickt wurde**
@@ -21,8 +8,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
+    // 1. **Datenbankverbindung herstellen**
+    $host = 'localhost';
+    $dbname = 'powderpoints';
+    $user = 'root';
+    $pass = '';
+    
+    // Verbindung herstellen
+    $mysqli = new mysqli($host, $user, $pass, $dbname);
+
+    // Verbindung prüfen
+    if ($mysqli->connect_error) {
+        die("Fehler: Verbindung fehlgeschlagen!"); 
+    }
+
     // 3. **Benutzer aus der Datenbank abrufen**
-    $stmt = $conn->prepare("SELECT id, password FROM users WHERE username = ?");
+    $stmt = $mysqli->prepare("SELECT id, password FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->store_result();
@@ -44,10 +45,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $error = "Benutzername existiert nicht!";
     }
-    $stmt->close();
-}
 
-$conn->close();
+    // Verbindungen schließen
+    $stmt->close();
+    $mysqli->close();
+}
 ?>
 
 <!DOCTYPE html>
