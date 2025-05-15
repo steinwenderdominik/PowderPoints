@@ -1,42 +1,41 @@
 <?php
 session_start(); // Sitzung starten
 
-// 1. **Datenbankverbindung herstellen**
+// 1. **Datenbankverbindung mit PDO**
 $host = 'localhost';
 $dbname = 'powderpoints';
 $user = 'root';
 $pass = '';
 
-$conn = new mysql($host, $user, $pass, $dbname);
-
-// Verbindung prüfen
-if ($conn->connect_error) {
-    die("Fehler: Verbindung fehlgeschlagen!"); 
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass);
+    // Fehler im Exception-Modus behandeln
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Fehler: Verbindung fehlgeschlagen! " . $e->getMessage());
 }
 
 $error = ""; // Fehler-Variable initialisieren
 
 // 2. **Prüfen, ob das Formular abgeschickt wurde**
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
     // 3. **Benutzer aus der Datenbank abrufen**
-    $stmt = $conn->prepare("SELECT id, password FROM users WHERE username = ?");
-    $stmt->bind_param("s", $username);
+    $stmt = $pdo->prepare("SELECT id, password FROM users WHERE username = :username");
+    $stmt->bindParam(':username', $username, PDO::PARAM_STR);
     $stmt->execute();
-    $stmt->store_result();
 
     // 4. **Benutzername prüfen**
-    if ($stmt->num_rows > 0) {
-        $stmt->bind_result($id, $hashed_password);
-        $stmt->fetch();
+    if ($stmt->rowCount() > 0) {
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // 5. **Passwort prüfen**
-        if (password_verify($password, $hashed_password)) {
-            $_SESSION['user_id'] = $id;
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $username;
-            header("Location: dashboard.php"); 
+            header("Location: dashboard.php");
             exit();
         } else {
             $error = "Falsches Passwort!";
@@ -44,10 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $error = "Benutzername existiert nicht!";
     }
-    $stmt->close();
 }
-
-$conn->close();
 ?>
 
 <!DOCTYPE html>
