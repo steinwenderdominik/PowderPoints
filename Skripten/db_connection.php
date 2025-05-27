@@ -1,12 +1,12 @@
 <?php
-try {
-    $dsn = "mysql:host=localhost;dbname=powderpoints;charset=utf8";
-    $pdo = new PDO($dsn, 'root', '', [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, 
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]);
-} catch (PDOException $e) {
-    die("Fehler beim Verbindungsaufbau zur Datenbank: " . $e->getMessage());
-}
-?>
+$host = 'localhost';
+$dbname = 'powderpoints';
+$user = 'root';
+$pass = '';
 
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Fehler bei der Datenbankverbindung: " . $e->getMessage());
+}

@@ -2,7 +2,7 @@
     require_once("db_connection.php");
 
     // Highscores abrufen
-    $query = "SELECT id, benutzername, toranzahl, laufzeit, datum FROM trainings ORDER BY datum DESC";
+    $query = "SELECT id, username, toranzahl, laufzeit";
     $result = $pdo->query($query);
 ?>
 
@@ -82,7 +82,6 @@
                     <th>Name</th>
                     <th>Toranzahl</th>
                     <th>Laufzeit</th>
-                    <th>Datum</th>
                     <th>Aktionen</th>
                 </tr>
 
@@ -91,7 +90,6 @@
                         <td><?= htmlspecialchars($row['benutzername']) ?></td>
                         <td><?= htmlspecialchars($row['toranzahl']) ?></td>
                         <td><?= htmlspecialchars($row['laufzeit']) ?> s</td>
-                        <td><?= htmlspecialchars($row['datum']) ?></td>
                         <td>
                             <a href="hsbearbeiten.php?id=<?= $row['id'] ?>" class="text-blue-600 hover:underline">Bearbeiten</a> |
                             <a href="hsloeschen.php?id=<?= $row['id'] ?>" class="text-red-600 hover:underline">Löschen</a>
