@@ -5,13 +5,12 @@ $message = ""; // Initialisieren der Message-Variable
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($_POST['username']) && !empty($_POST['toranzahl']) && !empty($_POST['laufzeit'])) {
-        // Eingaben bereinigen (XSS-Schutz)
         $username = htmlspecialchars(trim($_POST['username']));
-        $toranzahl = htmlspecialchars(trim($_POST['toranzahl']));
+        $toranzahl = (int) $_POST['toranzahl'];
         $laufzeit = htmlspecialchars(trim($_POST['laufzeit']));
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO trainings (username, toranzahl, laufzeit) VALUES (:username, :toranzahl, :laufzeit)");
+            $stmt = $pdo->prepare("INSERT INTO training (username, toranzahl, laufzeit) VALUES (:username, :toranzahl, :laufzeit)");
             $stmt->bindParam(":username", $username);
             $stmt->bindParam(":toranzahl", $toranzahl, PDO::PARAM_INT);
             $stmt->bindParam(":laufzeit", $laufzeit);
@@ -19,14 +18,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $message = "<div class='text-green-600 font-semibold mt-4'>Highscore erfolgreich eingetragen!</div>";
         } catch (PDOException $e) {
-            $message = "<div class='text-red-600 font-semibold mt-4'>Fehler beim Speichern des Highscores: " . htmlspecialchars($e->getMessage()) . "</div>";
+            $message = "<div class='text-red-600 font-semibold mt-4'>Fehler: " . htmlspecialchars($e->getMessage()) . "</div>";
         }
     } else {
         $message = "<div class='text-red-600 font-semibold mt-4'>Bitte fülle alle Felder aus!</div>";
     }
 }
-?>
 
+// Alle bisherigen Highscores abrufen
+$highscores = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM training ORDER BY toranzahl DESC, laufzeit ASC");
+    $highscores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $message .= "<div class='text-red-600 font-semibold mt-4'>Fehler beim Laden der Highscores: " . htmlspecialchars($e->getMessage()) . "</div>";
+}
+?>
 
 <!DOCTYPE html>
 <html lang="de">
@@ -43,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-family: Arial, sans-serif;
         }
         .snow-effect {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 12px;
             padding: 24px;
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
@@ -53,23 +60,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background: white;
             padding: 4px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        tr:hover {
-            background-color: rgba(0, 123, 255, 0.1);
         }
     </style>
 </head>
@@ -92,16 +82,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- Hauptinhalt -->
     <main class="flex-grow flex justify-center items-center p-6">
-        <section class="snow-effect max-w-lg w-full text-center">
-            <h2 class="text-3xl font-semibold text-blue-900 mb-4">Highscore melden</h2>
-            <p class="text-gray-700 mb-4">
+        <div class="snow-effect max-w-3xl w-full">
+            <h2 class="text-3xl font-semibold text-blue-900 mb-4 text-center">Highscore melden</h2>
+            <p class="text-gray-700 mb-6 text-center">
                 Trage deine Trainingsdaten ein und vergleiche dich mit anderen Athleten!
             </p>
 
-            <form method="POST" action="trainer.php" class="space-y-4">
+            <form method="POST" action="" class="space-y-4">
                 <div>
-                    <label for="name" class="block text-blue-900 font-semibold">Name:</label>
-                    <input type="text" name="name" id="name" required
+                    <label for="username" class="block text-blue-900 font-semibold">Name:</label>
+                    <input type="text" name="username" id="username" required
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
 
@@ -113,24 +103,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <div>
                     <label for="laufzeit" class="block text-blue-900 font-semibold">Laufzeit (Sekunden):</label>
-                    <input type="time" name="laufzeit" id="laufzeit" required
+                    <input type="text" name="laufzeit" id="laufzeit" placeholder="z. B. 00:45"
+                        pattern="^[0-9]{2}:[0-5][0-9]$" required
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
 
-                <button type="submit" name="submit"
+                <button type="submit"
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">
                     Highscore melden
                 </button>
             </form>
 
-            <?php if (!empty($message)) echo $message; ?>
-        </section>
+            <?= $message ?>
+
+            <!-- Highscore Tabelle -->
+            <?php if (!empty($highscores)) : ?>
+                <h3 class="text-2xl font-bold text-blue-900 mt-8 mb-4 text-center">Aktuelle Highscores</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-300 rounded text-center">
+                        <thead class="bg-blue-200">
+                            <tr>
+                                <th class="py-2 px-4 border">#</th>
+                                <th class="py-2 px-4 border">Name</th>
+                                <th class="py-2 px-4 border">Toranzahl</th>
+                                <th class="py-2 px-4 border">Laufzeit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($highscores as $index => $row): ?>
+                                <tr class="hover:bg-gray-100">
+                                    <td class="py-2 px-4 border"><?= $index + 1 ?></td>
+                                    <td class="py-2 px-4 border"><?= htmlspecialchars($row['username']) ?></td>
+                                    <td class="py-2 px-4 border"><?= htmlspecialchars($row['toranzahl']) ?></td>
+                                    <td class="py-2 px-4 border"><?= htmlspecialchars($row['laufzeit']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
     </main>
 
     <!-- Footer -->
     <footer class="bg-blue-900 text-white text-center py-4 mt-6">
         <p>&copy; 2025 PowderPoints. Alle Rechte vorbehalten.</p>
     </footer>
-
 </body>
 </html>
