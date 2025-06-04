@@ -71,9 +71,6 @@ try {
             <!-- Logo oder Titel -->
         </div>
         <div class="flex space-x-6">
-            <a href="highscore.php" class="icon-btn flex items-center hover:bg-blue-700 px-3 py-2 rounded-lg transition">
-                <img src="../Bilder/ski symbol.jpg" alt="Highscore" class="h-8 w-8 mr-2" /> Highscore
-            </a>
             <a href="login.php" class="icon-btn flex items-center hover:bg-blue-700 px-3 py-2 rounded-lg transition">
                 <img src="../Bilder/login mänchen.jpg" alt="Anmelden" class="h-8 w-8 mr-2" /> Anmelden
             </a>
