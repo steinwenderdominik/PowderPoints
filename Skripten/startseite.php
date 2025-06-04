@@ -44,6 +44,9 @@
             <a href="login.php" class="icon-btn flex items-center hover:bg-blue-700 px-3 py-2 rounded-lg transition">
                 <img src="../Bilder/login mänchen.jpg" alt="Anmelden" class="h-8 w-8 mr-2"> Anmelden
             </a>
+            <a href="registrieren.php" class="icon-btn flex items-center hover:bg-blue-700 px-3 py-2 rounded-lg transition">
+                <img src="../Bilder/login mänchen.jpg" alt="Registrieren" class="h-8 w-8 mr-2"> Registrieren
+            </a>
         </div>
     </header>
 

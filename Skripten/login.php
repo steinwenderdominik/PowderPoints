@@ -82,6 +82,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <a href="login.php" class="icon-btn flex items-center hover:bg-blue-700 px-3 py-2 rounded-lg transition">
                 <img src="../Bilder/login mänchen.jpg" alt="Anmelden" class="h-8 w-8 mr-2"> Anmelden
             </a>
+            <a href="startseite.php" class="icon-btn flex items-center hover:bg-blue-700 px-3 py-2 rounded-lg transition">
+                <img src="../Bilder/ski symbol.jpg" alt="startseite" class="h-8 w-8 mr-2" />Startseite
+            </a>
         </div>
     </header>
 
