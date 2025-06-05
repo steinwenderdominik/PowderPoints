@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $laufzeit = htmlspecialchars(trim($_POST['laufzeit']));
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO training (username, toranzahl, laufzeit) VALUES (:username, :toranzahl, :laufzeit)");
+            $stmt = $pdo->prepare("INSERT INTO trainings (username, toranzahl, laufzeit) VALUES (:username, :toranzahl, :laufzeit)");
             $stmt->bindParam(":username", $username);
             $stmt->bindParam(":toranzahl", $toranzahl, PDO::PARAM_INT);
             $stmt->bindParam(":laufzeit", $laufzeit);
@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Alle bisherigen Highscores abrufen
 $highscores = [];
 try {
-    $stmt = $pdo->query("SELECT * FROM training ORDER BY toranzahl DESC, laufzeit ASC");
+    $stmt = $pdo->query("SELECT * FROM trainings ORDER BY toranzahl DESC, laufzeit ASC");
     $highscores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $message .= "<div class='text-red-600 font-semibold mt-4'>Fehler beim Laden der Highscores: " . htmlspecialchars($e->getMessage()) . "</div>";
